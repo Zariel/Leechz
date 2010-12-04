@@ -27,6 +27,6 @@ Usenet::Usenet(char *host, int port)
 
 Usenet::~Usenet()
 {
-    delete addr;
+    disconnect(sockfd, 2);
 }
 
