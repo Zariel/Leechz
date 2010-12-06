@@ -5,6 +5,8 @@
 #include <string.h> /* memset */
 #include <stdio.h>  /* snpritnf */
 #include <unistd.h> /* close */
+#include <stdlib.h> /* atoi */
+
 #include <string>
 
 #include "usenet.h"
@@ -33,10 +35,70 @@ Usenet::Usenet(char *host, int port, int ipv6)
         printf("unable to connect\n");
     }
 
+    _recv();
+
+    _send("HELP");
+    _recv();
+
     connected = 1;
 }
 
-int Usenet::_send(std::string data)
+int parse(char *data, int *ret_code, string *ret_text)
+{
+    char buf[4];
+    memcpy(buf, data, 3);
+    buf[4] = '\0';
+
+    ret_code = (int*) malloc(sizeof(int) * 3);
+    *ret_code = atoi(buf);
+
+    /* TODO:
+     * Allocate ret_text
+     * Make sure ends in CLRF ?
+     */
+    return 0;
+}
+
+int Usenet::_recv()
+{
+    /* need to find CR-LF to check for terminated string */
+    int len = 0;
+    char buf[512];
+    int size = recv(sockfd, buf, 512, 0);
+
+    /*
+    int i = 1;
+    while(buf[i - 1] != 0xd && buf[i - 1] != 0xa) {
+        i++;
+    }
+
+    printf("0x%x 0x%x\n", buf[i - 1], buf[i]); 
+    printf("%d %d\n", i, size);
+    */
+
+    printf("%s%c\n", buf, 0);
+
+    return size;
+}
+
+/** TLS:
+ * connect
+ * TLS?
+ * STARTTLS
+ * <- TLS STUFF ->
+ * AUTH
+ */
+
+int Usenet::login(string name, string pw)
+{
+}
+
+int Usenet::_auth()
+{
+}
+
+/* ASSUMES DATA IS NOT CRLF TERMINATED */
+int Usenet::_send(string data)
 {
     /* Can we write to socket ? */
     int err = 0;
@@ -55,6 +117,10 @@ int Usenet::_send(std::string data)
         printf("Timeout or error in select\n");
         return -1;
     }
+
+    printf("SEND: %s\n", data.c_str());
+    /* CR-LF */
+    data += { 0xd, 0xa };
 
     err = write(sockfd, data.c_str(), data.size());
 
