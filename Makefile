@@ -1,15 +1,18 @@
 CC=g++
-CFLAGS=-std=c++0x
+CFLAGS=-std=c++0x -g
 LIBS=-lpthread
-OBJECTS=usenet.o 
+OBJECTS=usenet.o
 
 all: leechz
 
-leechz: usenet.o leechz.o
-	$(CC) $(CFLAGS) $(LIBS) usenet.o leechz.o -o leechz
+leechz: threadp.o usenet.o leechz.o
+	$(CC) $(CFLAGS) $(LIBS) threadp.o usenet.o leechz.o -o leechz
 
-usenet.o: usenet.cpp
+usenet.o: usenet.cpp usenet.h
 	$(CC) $(CFLAGS) -c usenet.cpp -o usenet.o
 
-leechz.o: leechz.cpp
+leechz.o: leechz.cpp leechz.h
 	$(CC) $(CFLAGS) -c leechz.cpp -o leechz.o
+
+threadp.o: threadp.cpp threadp.h
+	$(CC) $(CFLAGS) -c threadp.cpp -o threadp.o
