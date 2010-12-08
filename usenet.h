@@ -1,13 +1,21 @@
 #ifndef USENET_H
 #define USENET_H
 
+#include "threadp.h"
+
 using namespace std;
 
-class Usenet
+class Usenet : public Thread
 {
 private:
+    typedef Thread super;
+
     int connected;
     int sockfd;
+
+    char *host;
+    int port;
+    int ipv6;
 
     int _send(string data);
     int _recv();
@@ -18,6 +26,7 @@ public:
     ~Usenet();
 
     int login(string name, string pw);
+    virtual int exec();
 };
 
 #endif

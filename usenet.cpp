@@ -12,6 +12,12 @@
 #include "usenet.h"
 
 Usenet::Usenet(char *host, int port, int ipv6)
+    :host(host), port(port), ipv6(ipv6), Thread()
+{
+    printf("THREAD\n");
+}
+
+int Usenet::exec()
 {
     int err = 0;
     struct addrinfo hints;
@@ -41,6 +47,8 @@ Usenet::Usenet(char *host, int port, int ipv6)
     _recv();
 
     connected = 1;
+
+    return 0;
 }
 
 int parse(char *data, int *ret_code, string *ret_text)
@@ -72,7 +80,7 @@ int Usenet::_recv()
         i++;
     }
 
-    printf("0x%x 0x%x\n", buf[i - 1], buf[i]); 
+    printf("0x%x 0x%x\n", buf[i - 1], buf[i]);
     printf("%d %d\n", i, size);
     */
 
@@ -131,7 +139,10 @@ int Usenet::_send(string data)
 
 Usenet::~Usenet()
 {
-    _send("QUIT");
+    if(connected) {
+        _send("QUIT");
+    }
+
     shutdown(sockfd, SHUT_RDWR);
     close(sockfd);
 }
