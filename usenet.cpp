@@ -14,7 +14,6 @@
 Usenet::Usenet(char *host, int port, int ipv6)
     :host(host), port(port), ipv6(ipv6), Thread()
 {
-    printf("THREAD\n");
 }
 
 int Usenet::exec()
@@ -39,6 +38,7 @@ int Usenet::exec()
     /* Attempt connect */
     if((err = connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) < 0) {
         printf("unable to connect\n");
+        return -1;
     }
 
     _recv();
