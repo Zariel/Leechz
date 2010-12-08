@@ -16,6 +16,7 @@ public:
     void acquire(int block);
     int release();
     virtual int exec();
+    int join();
 
 };
 

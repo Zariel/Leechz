@@ -19,7 +19,7 @@ Thread::~Thread()
 
 void Thread::acquire(int block)
 {
-    if(block) {
+    if(!block) {
         pthread_mutex_trylock(&this->_lock);
     } else {
         pthread_mutex_lock(&this->_lock);
@@ -41,4 +41,12 @@ void *Thread::run(void *arg)
 
 int Thread::exec()
 {
+}
+
+int Thread::join()
+{
+    int *ret;
+    pthread_join(_id, NULL);
+
+    return 0;
 }
