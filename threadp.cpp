@@ -13,7 +13,7 @@ Thread::Thread()
 Thread::~Thread()
 {
     pthread_mutex_destroy(&this->_lock);
-    int ret;
+    int ret = 0;
     pthread_exit(&ret);
 }
 
@@ -45,8 +45,8 @@ int Thread::exec()
 
 int Thread::join()
 {
-    int *ret;
-    pthread_join(_id, NULL);
+    void *ret;
+    pthread_join(_id, &ret);
 
     return 0;
 }
