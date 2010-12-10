@@ -5,19 +5,28 @@ class Thread
 {
 private:
     pthread_t _id;
-    pthread_mutex_t _lock;
-    int locked;
     static void *run(void *arg);
 
 public:
     Thread();
     ~Thread();
 
-    void acquire(int block);
-    int release();
     virtual int exec();
     int join();
+};
 
+class Lock
+{
+private:
+    pthread_mutex_t _lock;
+    int locked;
+
+public:
+    Lock();
+    ~Lock();
+
+    int acquire(int block);
+    int release();
 };
 
 #endif
