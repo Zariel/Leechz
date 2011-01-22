@@ -41,10 +41,11 @@ int Usenet::exec()
         return -1;
     }
 
-    _recv();
+    char *buf;
+    _recv(buf);
 
     _send("HELP");
-    _recv();
+    _recv(buf);
 
     connected = 1;
 
@@ -67,24 +68,22 @@ int parse(char *data, int *ret_code, string *ret_text)
     return 0;
 }
 
-int Usenet::_recv()
+int Usenet::_recv(char *buf)
 {
     /* need to find CR-LF to check for terminated string */
     int len = 0;
-    char buf[512];
+    buf = (char*) malloc(sizeof(char) * 512);
     int size = recv(sockfd, buf, 512, 0);
 
-    /*
     int i = 1;
-    while(buf[i - 1] != 0xd && buf[i - 1] != 0xa) {
+    while(buf[i - 1] != 0xd && buf[i - 2] != 0xa) {
         i++;
     }
 
     printf("0x%x 0x%x\n", buf[i - 1], buf[i]);
     printf("%d %d\n", i, size);
-    */
 
-    printf("%s%c\n", buf, 0);
+    printf("%s\n", buf);
 
     return size;
 }
@@ -105,7 +104,6 @@ int Usenet::_auth()
 {
 }
 
-/* ASSUMES DATA IS NOT CRLF TERMINATED */
 int Usenet::_send(string data)
 {
     /* Can we write to socket ? */
@@ -126,11 +124,16 @@ int Usenet::_send(string data)
         return -1;
     }
 
+    int len = data.size();
+    if(data[len - 1] != 0xa && data[len - 2] != 0xd) {
+        data += { 0xd, 0xa };
+        len += 2;
+    }
+
     printf("SEND: %s\n", data.c_str());
     /* CR-LF */
-    data += { 0xd, 0xa };
 
-    err = write(sockfd, data.c_str(), data.size());
+    err = write(sockfd, data.c_str(), len);
 
     if(err < 0) {
         return -2;
