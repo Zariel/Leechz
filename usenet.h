@@ -18,7 +18,7 @@ private:
     int ipv6;
 
     int _send(string data);
-    int _recv();
+    int _recv(char *buf);
     int _auth();
 
 public:
