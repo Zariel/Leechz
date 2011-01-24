@@ -31,6 +31,7 @@ int Usenet::exec()
 
     if((err = getaddrinfo(host, _port, &hints, &servinfo)) < 0) {
         printf("getaddrinfo failed\n");
+        return -1;
     }
 
     sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
@@ -42,10 +43,13 @@ int Usenet::exec()
     }
 
     char *buf;
-    _recv(buf);
+    _recv(&buf);
 
     _send("HELP");
-    _recv(buf);
+    _recv(&buf);
+    if(buf != NULL) {
+        printf("%s\n", buf);
+    }
 
     connected = 1;
 
@@ -68,22 +72,71 @@ int parse(char *data, int *ret_code, string *ret_text)
     return 0;
 }
 
-int Usenet::_recv(char *buf)
+int Usenet::_recv(char **buf)
 {
+    int chunk_size = 1024;
     /* need to find CR-LF to check for terminated string */
     int len = 0;
-    buf = (char*) malloc(sizeof(char) * 512);
-    int size = recv(sockfd, buf, 512, 0);
 
-    int i = 1;
-    while(buf[i - 1] != 0xd && buf[i - 2] != 0xa) {
+    /* Read each buf into buffer then create buf at the end */
+    char *buffer[10];
+    int lengths[10];
+
+    int i = 0;
+    int size;
+
+    while(i < 10) {
+        buffer[i] = (char*) malloc(sizeof(char) * chunk_size);
+        char *p = buffer[i];
+        size = recv(sockfd, p, chunk_size, 0);
+
+        lengths[i] = size;
+        len += size;
+
+        if(p[size - 1] == 0xa &&
+           p[size - 2] == 0xd &&
+           p[size - 3] == 0x2e &&
+           p[size - 4] == 0xa &&
+           p[size - 5] == 0xd) {
+            /* muli length */
+            len -= 5;
+            lengths[i] -= 5;
+            break;
+        } else if(p[size - 1] == 0xa &&
+                 p[size - 2] == 0xd) {
+            /* get rid of crlf */
+            lengths[i] -= 2;
+            len -= 2;
+            break;
+        } else {
+            return -1;
+        }
+
         i++;
     }
 
-    printf("0x%x 0x%x\n", buf[i - 1], buf[i]);
-    printf("%d %d\n", i, size);
+    /*
+    *buf = (char*) malloc(sizeof(char) * len);
+    int offset = 0;
+    int length = 0;
+    for(i = 0; i < 10; i++) {
+        char *p = buffer[i];
+        while(*p) {
+            **buf++ = *p++;
+        }
+    }
+    */
 
-    printf("%s\n", buf);
+
+
+    /*
+    int i = 1;
+    while(i < 512 && (*buf)[i] != 0xd && (*buf)[i - 1] != 0xa) {
+        i++;
+    }
+
+    (*buf)[size] = '\0';
+    */
 
     return size;
 }
