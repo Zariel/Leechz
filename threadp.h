@@ -1,6 +1,8 @@
 #ifndef THREAD_P
 #define THREAD_P
 
+#include <pthread.h>
+
 class Thread
 {
 private:
@@ -25,7 +27,7 @@ public:
     Lock();
     ~Lock();
 
-    int acquire(int block);
+    int acquire(int block = 1);
     int release();
 };
 
