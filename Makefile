@@ -5,11 +5,14 @@ OBJECTS=usenet.o
 
 all: leechz
 
-leechz: threadp.o usenet.o leechz.o
-	$(CC) $(CFLAGS) $(LIBS) threadp.o usenet.o leechz.o -o leechz
+leechz: threadp.o usenet.o leechz.o con_pool.o
+	$(CC) $(CFLAGS) $(LIBS) threadp.o usenet.o con_pool.o leechz.o -o leechz
 
 usenet.o: usenet.cpp usenet.h
 	$(CC) $(CFLAGS) -c usenet.cpp -o usenet.o
+
+con_pool.o: con_pool.cpp con_pool.h
+	$(CC) $(CFLAGS) -c con_pool.cpp -o con_pool.o
 
 leechz.o: leechz.cpp leechz.h
 	$(CC) $(CFLAGS) -c leechz.cpp -o leechz.o
