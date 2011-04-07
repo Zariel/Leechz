@@ -49,13 +49,15 @@ private:
 public:
     Usenet(char *host, int port, int ipv6 = 0);
     ~Usenet();
+    virtual int exec();
+
+    Lock download_lock;
 
     int _connect();
     int login(string name, string pw);
-    virtual int exec();
-
     void flush_io();
     int download(string article, int size, int part, string file_name);
+    int* get_socket();
 };
 
 #endif

@@ -54,6 +54,7 @@ int Usenet::_connect()
 int Usenet::exec()
 {
     while(1) {
+        download_lock.acquire();
         _recv();
     }
 
@@ -76,6 +77,10 @@ int parse(char *data, int *ret_code, string *ret_text)
     return 0;
 }
 
+/*
+ * The event watcher notifies that there is something to download and releases
+ * the lock so we can fetch
+ */
 int Usenet::_recv()
 {
     recv_lock.acquire();
@@ -105,6 +110,8 @@ int Usenet::_auth()
 
 int Usenet::_send(string data)
 {
+    /* TODO: Rplace with epoll */
+
     /* Can we write to socket ? */
     int err = 0;
     fd_set wr;
@@ -141,12 +148,17 @@ int Usenet::_send(string data)
 
 int Usenet::download(string article, int size, int part, string file_name)
 {
-    
+
 }
 
 void Usenet::flush_io()
 {
-    recv_lock.acquire();
+    //recv_lock.acquire();
+}
+
+int *Usenet::get_socket()
+{
+    return &sockfd;
 }
 
 Usenet::~Usenet()
