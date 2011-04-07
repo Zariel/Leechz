@@ -1,16 +1,18 @@
 #include <string>
 
-#include "usenet.h"
+#include "con_pool.h"
 
 int main(int argc, char **argv)
 {
-    Usenet *conn = new Usenet("eu.news.astraweb.com", 119);
+
+    Connections *pool = new Connections("localhost", 5000, 0, 5);
+    //Connections *pool = new Connections("eu.news.astraweb.com", 119);
     //Usenet *conn = new Usenet("localhost", 5000);
-    printf("%d\n", conn->join());
+    pool->join();
 
     /* main loop */
 
-    delete conn;
+    delete pool;
 
     return 0;
 }
