@@ -1,9 +1,28 @@
 #ifndef USENET_H
 #define USENET_H
 
+#include <string>
+
 #include "threadp.h"
 
+#define RECV_SIZE (4 * 1024)
+
 using namespace std;
+
+class Article
+{
+private:
+    int part;
+    int size;
+    string article;
+    string file_name;
+
+public:
+    Article(string article, int size, int part, string file_name);
+    ~Article();
+};
+
+
 
 class Usenet : public Thread
 {
@@ -17,16 +36,26 @@ private:
     int port;
     int ipv6;
 
+    char *recv_buffer;
+
+    Lock recv_lock;
+
     int _send(string data);
-    int _recv(char **buf);
+    int _recv();
     int _auth();
+
+    Article *article;
 
 public:
     Usenet(char *host, int port, int ipv6 = 0);
     ~Usenet();
 
+    int _connect();
     int login(string name, string pw);
     virtual int exec();
+
+    void flush_io();
+    int download(string article, int size, int part, string file_name);
 };
 
 #endif

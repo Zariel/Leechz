@@ -16,8 +16,12 @@ Usenet::Usenet(char *host, int port, int ipv6)
 {
 }
 
-int Usenet::exec()
+int Usenet::_connect()
 {
+    if(connected) {
+        return 1;
+    }
+
     int err = 0;
     struct addrinfo hints;
     struct addrinfo *servinfo;
@@ -31,7 +35,7 @@ int Usenet::exec()
 
     if((err = getaddrinfo(host, _port, &hints, &servinfo)) < 0) {
         printf("getaddrinfo failed\n");
-        return -1;
+        return err;
     }
 
     sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
@@ -39,19 +43,19 @@ int Usenet::exec()
     /* Attempt connect */
     if((err = connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) < 0) {
         printf("unable to connect\n");
-        return -1;
-    }
-
-    char *buf;
-    _recv(&buf);
-
-    _send("HELP");
-    _recv(&buf);
-    if(buf != NULL) {
-        printf("%s\n", buf);
+        return err;
     }
 
     connected = 1;
+
+    return 1;
+}
+
+int Usenet::exec()
+{
+    while(1) {
+        _recv();
+    }
 
     return 0;
 }
@@ -72,73 +76,15 @@ int parse(char *data, int *ret_code, string *ret_text)
     return 0;
 }
 
-int Usenet::_recv(char **buf)
+int Usenet::_recv()
 {
-    int chunk_size = 1024;
-    /* need to find CR-LF to check for terminated string */
-    int len = 0;
+    recv_lock.acquire();
 
-    /* Read each buf into buffer then create buf at the end */
-    char *buffer[10];
-    int lengths[10];
+    recv_buffer = (char*) malloc(RECV_SIZE);
 
-    int i = 0;
-    int size;
+    int err = recv(sockfd, recv_buffer, RECV_SIZE, 0);
 
-    while(i < 10) {
-        buffer[i] = (char*) malloc(sizeof(char) * chunk_size);
-        char *p = buffer[i];
-        size = recv(sockfd, p, chunk_size, 0);
-
-        lengths[i] = size;
-        len += size;
-
-        if(p[size - 1] == 0xa &&
-           p[size - 2] == 0xd &&
-           p[size - 3] == 0x2e &&
-           p[size - 4] == 0xa &&
-           p[size - 5] == 0xd) {
-            /* muli length */
-            len -= 5;
-            lengths[i] -= 5;
-            break;
-        } else if(p[size - 1] == 0xa &&
-                 p[size - 2] == 0xd) {
-            /* get rid of crlf */
-            lengths[i] -= 2;
-            len -= 2;
-            break;
-        } else {
-            return -1;
-        }
-
-        i++;
-    }
-
-    /*
-    *buf = (char*) malloc(sizeof(char) * len);
-    int offset = 0;
-    int length = 0;
-    for(i = 0; i < 10; i++) {
-        char *p = buffer[i];
-        while(*p) {
-            **buf++ = *p++;
-        }
-    }
-    */
-
-
-
-    /*
-    int i = 1;
-    while(i < 512 && (*buf)[i] != 0xd && (*buf)[i - 1] != 0xa) {
-        i++;
-    }
-
-    (*buf)[size] = '\0';
-    */
-
-    return size;
+    recv_lock.release();
 }
 
 /** TLS:
@@ -191,6 +137,16 @@ int Usenet::_send(string data)
     if(err < 0) {
         return -2;
     }
+}
+
+int Usenet::download(string article, int size, int part, string file_name)
+{
+    
+}
+
+void Usenet::flush_io()
+{
+    recv_lock.acquire();
 }
 
 Usenet::~Usenet()
