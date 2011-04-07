@@ -2,6 +2,7 @@
 #define CON_POOL_H
 
 #include <vector>
+#include <sys/epoll.h>
 
 #include "threadp.h"
 #include "usenet.h"
@@ -17,6 +18,8 @@ private:
     int port;
     int ipv6;
     int count;
+
+    int epfd;
 
 public:
     Connections(char *host, int port, int ipv6, int count = 0);
