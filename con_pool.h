@@ -17,7 +17,6 @@ private:
 	const int max_events = 20;
 	const int timeout = -1;
 
-
     char *host;
     int port;
     int ipv6;

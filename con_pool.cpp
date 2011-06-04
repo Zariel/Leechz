@@ -32,6 +32,7 @@ Connections::~Connections()
 int Connections::exec()
 {
 	struct epoll_event *events;
+	Usenet *conn;
 
     /* Poll all of the epoll sockets and release locks to download */
     while(1) {
@@ -42,7 +43,7 @@ int Connections::exec()
         if (nfds < 0) return 1);
 
         for(int i = 0; i < nfds; i++) {
-            int fd = events[i].data.fd;
+			conn = events[i].data.ptr;
         }
     }
 
