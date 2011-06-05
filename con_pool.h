@@ -14,6 +14,9 @@ class Connections : public Thread
 private:
     vector<Usenet*> pool;
 
+	const int max_events = 20;
+	const int timeout = -1;
+
     char *host;
     int port;
     int ipv6;
