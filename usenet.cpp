@@ -19,7 +19,7 @@ Usenet::Usenet(char *host, int port, int ipv6)
 
 Usenet::~Usenet()
 {
-    buffer_id();
+    buffer_io();
     flush_io();
 }
 
@@ -27,7 +27,7 @@ int Usenet::exec()
 {
     while(1) {
         download_lock.acquire();
-        _recv();
+        socket->_recv();
     }
 
     return 0;
@@ -81,5 +81,10 @@ void Usenet::flush_io()
 
 void Usenet::buffer_io()
 {
+}
+
+int *Usenet::get_socket()
+{
+    return socket->get_socket();
 }
 

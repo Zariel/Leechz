@@ -30,12 +30,13 @@ private:
     Lock io_lock;
 
     int io_buffer_len;
+    Connection *socket;
 
 public:
     Usenet(char *host, int port, int ipv6 = 0);
     ~Usenet();
     virtual int exec();
-    virtial void buffer_io();
+    virtual void buffer_io();
 
     Lock download_lock;
 
@@ -43,6 +44,7 @@ public:
     void flush_io();
     int download(string article, int size, int part, string file_name);
     int _auth();
+    int *get_socket();
 };
 
 #endif
