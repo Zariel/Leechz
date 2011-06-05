@@ -70,10 +70,9 @@ int Connection::_recv()
 
     recv_buffer = (char*) malloc(RECV_SIZE);
 
-    int err = recv(sockfd, recv_buffer, RECV_SIZE, 0);
+    recv_len = recv(sockfd, recv_buffer, RECV_SIZE, 0);
 
-    buffer_io();
-
+    /* Superviser thread releases this */
     recv_lock.release();
 }
 
@@ -113,7 +112,7 @@ int Connection::_send(string data)
     }
 }
 
-int* Connection::get_socket()
+int *Connection::get_socket()
 {
     return &sockfd;
 }

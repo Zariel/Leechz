@@ -12,10 +12,16 @@
 #include "usenet.h"
 
 Usenet::Usenet(char *host, int port, int ipv6)
-    :Thread(), Connection(host, port, ipv6)
+    :Thread()
 {
+    socket = new Connection(host, port, ipv6);
 }
 
+Usenet::~Usenet()
+{
+    buffer_id();
+    flush_io();
+}
 
 int Usenet::exec()
 {
@@ -75,11 +81,5 @@ void Usenet::flush_io()
 
 void Usenet::buffer_io()
 {
-}
-
-
-Usenet::~Usenet()
-{
-    flush_io();
 }
 

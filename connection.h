@@ -23,6 +23,8 @@ protected:
 
     int sockfd;
     char *recv_buffer;
+    int recv_len;
+
     int _recv();
     int _send(string data);
     int _connect();

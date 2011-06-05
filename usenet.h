@@ -22,7 +22,7 @@ public:
 };
 
 
-class Usenet : public Thread, public Connection
+class Usenet : public Thread
 {
 private:
     Article *article;
@@ -38,7 +38,6 @@ public:
     virtial void buffer_io();
 
     Lock download_lock;
-
 
     int login(string name, string pw);
     void flush_io();
