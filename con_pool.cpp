@@ -7,8 +7,18 @@
     Connections::Connections(char *host, int port, int ipv6, int count)
 :host(host), port(port), ipv6(ipv6), count(count), Thread()
 {
-    should_die = false;
+    kill_lock = new Lock();
+}
 
+Connections::~Connections()
+{
+    int i;
+    for(i = 0; i < count; i++) {
+        delete 
+}
+
+void Connections::init()
+{
     epfd = epoll_create(count);
 
     int i;
@@ -27,18 +37,17 @@
     }
 }
 
-Connections::~Connections()
-{
-}
-
 int Connections::exec()
 {
+    init();
+
     struct epoll_event *events;
     Usenet *conn;
 
     /* Poll all of the epoll sockets and release locks to download */
     while(1) {
-        if(should_die) {
+        printf("bitchin\n");
+        if(!kill_lock->acquire(0)) {
             break;
         }
 
@@ -53,10 +62,4 @@ int Connections::exec()
     }
 
     return 0;
-}
-
-
-void Connections::kill()
-{
-    should_die = true;
 }

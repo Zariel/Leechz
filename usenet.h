@@ -37,6 +37,7 @@ public:
     ~Usenet();
     virtual int exec();
     virtual void buffer_io();
+    int connect_err;
 
     Lock download_lock;
 

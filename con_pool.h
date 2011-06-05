@@ -15,7 +15,7 @@ private:
     vector<Usenet*> pool;
 
     static const int max_events = 20;
-    static const int epoll_timeout = -1;
+    static const int epoll_timeout = 30;
 
     char *host;
     int port;
@@ -23,13 +23,12 @@ private:
     int count;
 
     int epfd;
-    bool should_die;
+    void init();
 
 public:
     Connections(char *host, int port, int ipv6, int count = 0);
     ~Connections();
-
-    void kill();
+    Lock *kill_lock;
 
     virtual int exec();
 };

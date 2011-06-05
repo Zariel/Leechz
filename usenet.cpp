@@ -15,12 +15,15 @@ Usenet::Usenet(char *host, int port, int ipv6)
     :Thread()
 {
     socket = new Connection(host, port, ipv6);
+    connect_err = socket->_connect();
 }
 
 Usenet::~Usenet()
 {
     buffer_io();
     flush_io();
+
+    delete socket;
 }
 
 int Usenet::exec()

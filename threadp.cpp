@@ -45,13 +45,14 @@ Lock::~Lock()
 
 int Lock::acquire(int block)
 {
+    int ret = 0;
     if(!block) {
-        pthread_mutex_trylock(&this->_lock);
+        ret = pthread_mutex_trylock(&this->_lock);
     } else {
-        pthread_mutex_lock(&this->_lock);
+        ret = pthread_mutex_lock(&this->_lock);
     }
 
-    return 0;
+    return ret;
 }
 
 int Lock::release()
