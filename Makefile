@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++0x -g
+CFLAGS=-std=c++0x -g -ggdb
 LIBS=-lpthread
 
 all: leechz
