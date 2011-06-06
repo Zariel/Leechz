@@ -7,14 +7,14 @@
     Connections::Connections(char *host, int port, int ipv6, int count)
 :host(host), port(port), ipv6(ipv6), count(count), Thread()
 {
-    kill_lock = new Lock();
+    init_lock->acquire();
+    kill_lock->acquire();
 }
 
 Connections::~Connections()
 {
-    int i;
-    for(i = 0; i < count; i++) {
-        delete 
+    delete kill_lock;
+    delete init_lock;
 }
 
 void Connections::init()
@@ -35,6 +35,8 @@ void Connections::init()
 
         epoll_ctl(epfd, EPOLL_CTL_ADD, *(conn->get_socket()), &ev);
     }
+
+    init_lock->release();
 }
 
 int Connections::exec()
@@ -46,7 +48,6 @@ int Connections::exec()
 
     /* Poll all of the epoll sockets and release locks to download */
     while(1) {
-        printf("bitchin\n");
         if(!kill_lock->acquire(0)) {
             break;
         }
@@ -60,6 +61,17 @@ int Connections::exec()
             conn = (Usenet*)events[i].data.ptr;
         }
     }
+
+    int i;
+    for(i = 0; i < count; i++) {
+        Usenet *conn = pool[i];
+        conn->kill_lock->release();
+
+        int ret = conn->join();
+        printf("%d\n", ret);
+        delete conn;
+    }
+
 
     return 0;
 }
