@@ -51,6 +51,7 @@ pthread_t Thread::getID()
 Lock::Lock()
 {
     pthread_mutex_init(&_lock, NULL);
+    locked = 0;
 }
 
 Lock::~Lock()
