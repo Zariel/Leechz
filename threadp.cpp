@@ -1,6 +1,7 @@
 #include <pthread.h>
 
 #include "threadp.h"
+#include <stdio.h>
 
 Thread::Thread()
 {
@@ -51,6 +52,7 @@ pthread_t Thread::getID()
 Lock::Lock()
 {
     pthread_mutex_init(&_lock, NULL);
+    id = l_id++;
     locked = 0;
 }
 
@@ -64,6 +66,7 @@ Lock::~Lock()
 int Lock::acquire(int block)
 {
     int ret = 0;
+    printf("[0x%x] Locking: %d (blocking = %d)\n", this, id, block);
 
     if(!block) {
         ret = pthread_mutex_trylock(&_lock);
@@ -78,6 +81,8 @@ int Lock::acquire(int block)
 
 int Lock::release()
 {
+    printf("Unlocking: %d (locked = %d)\n", id, locked);
+
     if(locked) {
         pthread_mutex_unlock(&_lock);
     }

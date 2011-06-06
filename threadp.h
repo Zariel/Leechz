@@ -20,11 +20,14 @@ public:
     pthread_t getID();
 };
 
+static int l_id = 0;
+
 class Lock
 {
 private:
     pthread_mutex_t _lock;
     int locked;
+    int id;
 
 public:
     Lock();
