@@ -55,7 +55,8 @@ Lock::Lock()
 
 Lock::~Lock()
 {
-    pthread_mutex_destroy(&this->_lock);
+    release();
+    pthread_mutex_destroy(&_lock);
 }
 
 
