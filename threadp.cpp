@@ -5,12 +5,12 @@
 Thread::Thread()
 {
     pthread_create(&thread, NULL, Thread::run, reinterpret_cast<void*>(this));
-    id = pthread_self();
 }
 
 Thread::~Thread()
 {
-    exit();
+    //LOG("Exiting - tid = %u\n", thread);
+    join();
 }
 
 int Thread::exit()
@@ -43,9 +43,9 @@ int Thread::cancel()
     pthread_cancel(thread);
 }
 
-int Thread::getID()
+pthread_t Thread::getID()
 {
-    return id;
+    return thread;
 }
 
 Lock::Lock()
@@ -64,9 +64,9 @@ int Lock::acquire(int block)
 {
     int ret = 0;
     if(!block) {
-        ret = pthread_mutex_trylock(&this->_lock);
+        ret = pthread_mutex_trylock(&_lock);
     } else {
-        ret = pthread_mutex_lock(&this->_lock);
+        ret = pthread_mutex_lock(&_lock);
     }
 
     return ret;

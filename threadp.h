@@ -8,7 +8,6 @@ class Thread
 private:
     pthread_t thread;
     static void *run(void *arg);
-    int id;
 
 public:
     Thread();
@@ -18,7 +17,7 @@ public:
     int join();
     int exit();
     int cancel();
-    int getID();
+    pthread_t getID();
 };
 
 class Lock
