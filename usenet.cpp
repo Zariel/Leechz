@@ -14,10 +14,12 @@
  * nicely.
  */
 Usenet::Usenet(char *host, int port, int ipv6)
-    :host(host), port(port), ipv6(ipv6), Thread()
+    :host(host), port(port), ipv6(ipv6)
 {
     init_lock = new Lock();
     init_lock->acquire();
+
+    Thread();
 }
 
 Usenet::~Usenet()
@@ -31,9 +33,13 @@ Usenet::~Usenet()
 
 void Usenet::init()
 {
-    printf("%u\n", getID());
+    printf("[0x%x] Usenet thread id = %u\n", this, getID());
+
     socket = new Connection(host, port, ipv6);
     connect_err = socket->_connect();
+
+    download_lock = new Lock();
+    kill_lock = new Lock();
 
     init_lock->release();
 }
@@ -49,7 +55,7 @@ int Usenet::exec()
         }
         */
 
-        download_lock.acquire();
+        download_lock->acquire();
         socket->_recv();
     }
 

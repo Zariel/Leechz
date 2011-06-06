@@ -43,8 +43,8 @@ public:
     virtual void buffer_io();
     int connect_err;
 
-    Lock download_lock;
-    Lock kill_lock;
+    Lock *download_lock;
+    Lock *kill_lock;
     Lock *init_lock;
 
     int login(string name, string pw);
