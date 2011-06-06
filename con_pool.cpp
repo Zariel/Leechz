@@ -22,16 +22,22 @@ Connections::~Connections()
 
 void Connections::init()
 {
+    Usenet *conn;
     epfd = epoll_create(count);
 
+    /* Initialize worker threads in parrallell */
     int i;
     for(i = 0; i < count; i++) {
-        /* Not connected */
-        Usenet *conn = new Usenet(host, port, ipv6);
-        conn->init_lock->acquire();
-        conn->init_lock->release();
+        conn = new Usenet(host, port, ipv6);
 
         pool.push_back(conn);
+    }
+
+    for(i = 0; i < count; i++) {
+        conn = pool[i];
+        /* Not connected */
+        conn->init_lock->acquire();
+        conn->init_lock->release();
 
         static struct epoll_event ev;
         ev.events = EPOLLIN | EPOLLPRI | EPOLLERR | EPOLLHUP;
