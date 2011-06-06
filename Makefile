@@ -22,3 +22,5 @@ leechz.o: leechz.cpp leechz.h
 threadp.o: threadp.cpp threadp.h
 	$(CC) $(CFLAGS) -c threadp.cpp -o threadp.o
 
+clean:
+	rm *.o leechz
