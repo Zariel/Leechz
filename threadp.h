@@ -6,15 +6,19 @@
 class Thread
 {
 private:
-    pthread_t _id;
+    pthread_t thread;
     static void *run(void *arg);
+    int id;
 
 public:
     Thread();
-    ~Thread();
+    virtual ~Thread();
 
     virtual int exec();
     int join();
+    int exit();
+    int cancel();
+    int getID();
 };
 
 class Lock

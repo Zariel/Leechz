@@ -4,15 +4,21 @@
 
 Thread::Thread()
 {
-    pthread_create(&_id, NULL, Thread::run, reinterpret_cast<void*>(this));
+    pthread_create(&thread, NULL, Thread::run, reinterpret_cast<void*>(this));
+    id = pthread_self();
 }
 
 Thread::~Thread()
 {
-    int ret = 0;
-    pthread_exit(&ret);
+    exit();
 }
 
+int Thread::exit()
+{
+    int ret = 1;
+    pthread_exit(&ret);
+    return 0;
+}
 
 void *Thread::run(void *arg)
 {
@@ -27,9 +33,19 @@ int Thread::exec()
 int Thread::join()
 {
     void *ret;
-    pthread_join(_id, &ret);
+    pthread_join(thread, &ret);
 
     return 0;
+}
+
+int Thread::cancel()
+{
+    pthread_cancel(thread);
+}
+
+int Thread::getID()
+{
+    return id;
 }
 
 Lock::Lock()
