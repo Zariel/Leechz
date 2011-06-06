@@ -28,8 +28,8 @@ private:
 public:
     Connections(char *host, int port, int ipv6, int count = 0);
     ~Connections();
-    Lock kill_lock;
-    Lock init_lock;
+    Lock *kill_lock;
+    Lock *init_lock;
 
     virtual int exec();
 };

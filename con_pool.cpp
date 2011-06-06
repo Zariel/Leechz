@@ -7,6 +7,9 @@
     Connections::Connections(char *host, int port, int ipv6, int count)
 :host(host), port(port), ipv6(ipv6), count(count), Thread()
 {
+    kill_lock = new Lock();
+    init_lock = new Lock();
+
     init_lock->acquire();
     kill_lock->acquire();
 }
@@ -25,6 +28,8 @@ void Connections::init()
     for(i = 0; i < count; i++) {
         /* Not connected */
         Usenet *conn = new Usenet(host, port, ipv6);
+        conn->init_lock->acquire();
+        conn->init_lock->release();
 
         pool.push_back(conn);
 
@@ -65,7 +70,7 @@ int Connections::exec()
     int i;
     for(i = 0; i < count; i++) {
         Usenet *conn = pool[i];
-        conn->kill_lock->release();
+        //conn->kill_lock->release();
 
         int ret = conn->join();
         printf("%d\n", ret);
