@@ -21,7 +21,6 @@ public:
     ~Article();
 };
 
-
 class Usenet : public Thread
 {
 private:
@@ -29,17 +28,24 @@ private:
 
     Lock io_lock;
 
+    char *host;
+    int port;
+    int ipv6;
+
     int io_buffer_len;
     Connection *socket;
+    void init();
 
 public:
     Usenet(char *host, int port, int ipv6 = 0);
-    ~Usenet();
+    virtual ~Usenet();
     virtual int exec();
     virtual void buffer_io();
     int connect_err;
 
     Lock download_lock;
+    Lock kill_lock;
+    Lock *init_lock;
 
     int login(string name, string pw);
     void flush_io();

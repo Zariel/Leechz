@@ -10,12 +10,14 @@
 #include <string>
 
 #include "usenet.h"
-
+/* Should make socket its own thread instead of this class so we can kill it
+ * nicely.
+ */
 Usenet::Usenet(char *host, int port, int ipv6)
-    :Thread()
+    :host(host), port(port), ipv6(ipv6), Thread()
 {
-    socket = new Connection(host, port, ipv6);
-    connect_err = socket->_connect();
+    init_lock = new Lock();
+    init_lock->acquire();
 }
 
 Usenet::~Usenet()
@@ -23,12 +25,30 @@ Usenet::~Usenet()
     buffer_io();
     flush_io();
 
-    delete socket;
+    delete &kill_lock;
+    delete &socket;
+}
+
+void Usenet::init()
+{
+    printf("%u\n", getID());
+    socket = new Connection(host, port, ipv6);
+    connect_err = socket->_connect();
+
+    init_lock->release();
 }
 
 int Usenet::exec()
 {
+    init();
+
     while(1) {
+        /*
+        if(!kill_lock->acquire(0)) {
+            break;
+        }
+        */
+
         download_lock.acquire();
         socket->_recv();
     }
